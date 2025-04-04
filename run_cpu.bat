@@ -1,6 +1,6 @@
 @echo off
 echo Starting Python script...
 
-python src/main.py
+"%~dp0python_cpu\python.exe" src/main.py
 
 pause
