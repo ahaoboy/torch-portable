@@ -78,26 +78,11 @@ jobs:
 
           python --version
 
-      # - name: install pyopenjtalk
-      #   run: |
-      #     pip install git+https://github.com/r9y9/pyopenjtalk.git@fix-cmake4
-
-      # pip install aliyun-python-sdk-dyvmsapi
-      # pip install aliyun-python-sdk-core
-
-      # pip install aliyun-python-sdk-core-v3==2.13.10
-      # # pip install --config-settings="--build-option=build_ext" --config-settings="--build-option=--plat-name=win-amd64" jieba_fast
-
       - name: install requirements
         run: |
           pip install requirements.cpu.txt
-          ./bat-en/zundamonspeech_builder_cpu_v1.0.bat
 
           python ./src/main.py
-
-      # - name: build nltk
-      #   run: |
-      #     pip install nltk
 
       - name: zip
         run: |
