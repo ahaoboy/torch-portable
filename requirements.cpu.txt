@@ -1,2 +1,2 @@
 torch==2.1.2 --index-url https://download.pytorch.org/whl/cpu
-numpy==1.23.1
+numpy==1.23.4
