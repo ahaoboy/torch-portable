@@ -1,6 +1,11 @@
 import torch
 import numpy as np
 
+if torch.cuda.is_available():
+    print("cuda is available")
+else:
+    print("cuda is not available")
+
 np.random.seed(42)
 x = np.linspace(-10, 10, 100)
 y = 2 * x + 1 + np.random.normal(0, 1, 100)
