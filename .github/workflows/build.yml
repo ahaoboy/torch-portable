@@ -89,6 +89,7 @@ jobs:
         run: |
           pip show torch
           mkdir dist
+          Get-ChildItem -Path "./python_cpu/scripts" -Filter "pip*.exe" | Remove-Item -Force
           7z a -tzip ./dist/torch_cpu.zip python_cpu src run.bat
           7z a -tzip ./dist/python_cpu.zip python_cpu
           ls dist
