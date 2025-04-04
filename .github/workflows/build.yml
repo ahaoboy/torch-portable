@@ -83,6 +83,8 @@ jobs:
           pip install -r requirements.cpu.txt
           pip install -r torch.cpu.txt
 
+      - name: run
+        run: |
           python ./src/main.py
 
       - name: zip
@@ -102,7 +104,6 @@ jobs:
           allowUpdates: true
 
   build-windows-gpu:
-    if: false
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -131,40 +132,48 @@ jobs:
       #     echo "$PWD\python" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
       #     echo "$PWD\python\Scripts" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
 
-      - name: Download Python Embeddable  3.9.13
+      - name: Download Python 3.9.13
         run: |
-          $PYTHON_VERSION = "3.9.13"
-          $URL = "https://www.python.org/ftp/python/$PYTHON_VERSION/python-$PYTHON_VERSION-embed-amd64.zip"
-          Invoke-WebRequest -Uri $URL -OutFile "python-embed.zip"
-          Expand-Archive -Path "python-embed.zip" -DestinationPath "python_gpu"
-          Invoke-WebRequest -Uri "https://bootstrap.pypa.io/get-pip.py" -OutFile "get-pip.py"
-          ./python_gpu/python.exe get-pip.py
-          $pthFile = Get-ChildItem -Path "python_gpu" -Filter "python*._pth" | Select-Object -First 1
-          $content = Get-Content -Path "python_gpu/$($pthFile.Name)"
-          $content = $content -replace "#import site", "import site"
-          $content += "Lib\site-packages"
-          # $content += "."
-          Set-Content -Path "python_gpu/$($pthFile.Name)" -Value $content
-
-          mkdir -p ~/pip
-          echo "[global]" >> ~/pip/pip.ini
-          echo "no-cache-dir = true" >> ~/pip/pip.ini
-          echo "target = ${PWD}/python_gpu/Lib/site-packages/" >> ~/pip/pip.ini
-
-          cat ~/pip/pip.ini
-
+          Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.9.13/python-3.9.13-amd64.exe" -OutFile "python_installer.exe"
+          Start-Process -FilePath ".\python_installer.exe" -ArgumentList "/quiet InstallAllUsers=0 TargetDir=$PWD\python_gpu" -NoNewWindow -Wait
           echo "$PWD\python_gpu" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
           echo "$PWD\python_gpu\Scripts" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
+
+          # mkdir -p ~/pip
+          # echo "[global]" >> ~/pip/pip.ini
+          # echo "no-cache-dir = true" >> ~/pip/pip.ini
+          # echo "target = ${PWD}/python_gpu/Lib/site-packages/" >> ~/pip/pip.ini
+          # cat ~/pip/pip.ini
+
+      # - name: Download Python Embeddable  3.9.13
+      #   run: |
+      #     $PYTHON_VERSION = "3.9.13"
+      #     $URL = "https://www.python.org/ftp/python/$PYTHON_VERSION/python-$PYTHON_VERSION-embed-amd64.zip"
+      #     Invoke-WebRequest -Uri $URL -OutFile "python-embed.zip"
+      #     Expand-Archive -Path "python-embed.zip" -DestinationPath "python_gpu"
+      #     Invoke-WebRequest -Uri "https://bootstrap.pypa.io/get-pip.py" -OutFile "get-pip.py"
+      #     ./python_gpu/python.exe get-pip.py
+      #     $pthFile = Get-ChildItem -Path "python_gpu" -Filter "python*._pth" | Select-Object -First 1
+      #     $content = Get-Content -Path "python_gpu/$($pthFile.Name)"
+      #     $content = $content -replace "#import site", "import site"
+      #     $content += "Lib\site-packages"
+      #     # $content += "."
+      #     Set-Content -Path "python_gpu/$($pthFile.Name)" -Value $content
+
+      #     mkdir -p ~/pip
+      #     echo "[global]" >> ~/pip/pip.ini
+      #     echo "no-cache-dir = true" >> ~/pip/pip.ini
+      #     echo "target = ${PWD}/python_gpu/Lib/site-packages/" >> ~/pip/pip.ini
+
+      #     cat ~/pip/pip.ini
+
+      #     echo "$PWD\python_gpu" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
+      #     echo "$PWD\python_gpu\Scripts" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
 
       - name: Install CUDA
         uses: Jimver/cuda-toolkit@master
         with:
           cuda: "12.1.0"
-
-      - name: install nltk
-        run: |
-          pip install nltk
-          python -c "import nltk; nltk.download('averaged_perceptron_tagger'); nltk.download('averaged_perceptron_tagger_eng')"
 
       - name: version
         run: |
@@ -173,24 +182,29 @@ jobs:
 
           python --version
 
-      - name: install pyopenjtalk
-        run: |
-          pip install git+https://github.com/r9y9/pyopenjtalk.git@fix-cmake4
-          pip install aliyun-python-sdk-dyvmsapi
-          pip install aliyun-python-sdk-core-v3==2.13.10
-          pip install aliyun-python-sdk-core
-          # pip install --config-settings="--build-option=build_ext" --config-settings="--build-option=--plat-name=win-amd64" jieba_fast
-
       - name: install zundamonspeech_builder_gpu_v1
         run: |
-          ./bat-en/zundamonspeech_builder_gpu_v1.0.bat
+          pip install -r requirements.cpu.txt
+          pip install -r torch.gpu.txt
 
+      - name: run
+        run: |
+          python src/main.py
+
+      # - name: zip
+      #   run: |
+      #     mkdir dist
+      #     7z a -tzip ./dist/zundamonspeech_builder_gpu.zip python_gpu zundamon-speech-webui -v2000m
+      #     7z a -tzip ./dist/python_gpu.zip python_gpu
+
+      #     ls dist
       - name: zip
         run: |
+          pip show torch
           mkdir dist
-          7z a -tzip ./dist/zundamonspeech_builder_gpu.zip python_gpu zundamon-speech-webui -v2000m
+          Get-ChildItem -Path "./python_gpu/scripts" -Filter "pip*.exe" | Remove-Item -Force
+          7z a -tzip ./dist/torch_gpu.zip python_gpu src run.bat
           7z a -tzip ./dist/python_gpu.zip python_gpu
-
           ls dist
 
       - name: release
