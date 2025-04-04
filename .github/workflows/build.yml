@@ -182,9 +182,9 @@ jobs:
 
           python --version
 
-      - name: install zundamonspeech_builder_gpu_v1
+      - name: install requirements
         run: |
-          pip install -r requirements.cpu.txt
+          pip install -r requirements.gpu.txt
           pip install -r torch.gpu.txt
 
       - name: run
@@ -203,8 +203,8 @@ jobs:
           pip show torch
           mkdir dist
           Get-ChildItem -Path "./python_gpu/scripts" -Filter "pip*.exe" | Remove-Item -Force
-          7z a -tzip ./dist/torch_gpu.zip python_gpu src run_gpu.bat
-          7z a -tzip ./dist/python_gpu.zip python_gpu
+          7z a -tzip ./dist/torch_gpu.zip python_gpu src run_gpu.bat -v2000m
+          7z a -tzip ./dist/python_gpu.zip python_gpu -v2000m
           ls dist
 
       - name: release

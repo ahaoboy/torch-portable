@@ -6,6 +6,10 @@ if torch.cuda.is_available():
 else:
     print("cuda is not available")
 
+print(torch.__version__)
+print(torch.cuda.is_available())
+print(torch.version.cuda)
+
 np.random.seed(42)
 x = np.linspace(-10, 10, 100)
 y = 2 * x + 1 + np.random.normal(0, 1, 100)
