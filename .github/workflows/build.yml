@@ -87,6 +87,7 @@ jobs:
 
       - name: zip
         run: |
+          pip show torch
           mkdir dist
           7z a -tzip  python_cpu zundamon-speech-webui src
           7z a -tzip ./dist/python_cpu.zip python_cpu
