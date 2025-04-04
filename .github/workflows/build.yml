@@ -81,6 +81,7 @@ jobs:
       - name: install requirements
         run: |
           pip install requirements.cpu.txt
+          pip install torch.cpu.txt
 
           python ./src/main.py
 
